@@ -1,16 +1,9 @@
 import { Component } from 'react';
-import { nanoid } from 'nanoid';
 import { Report } from 'notiflix/build/notiflix-report-aio';
 import ContactForm from './contactForm/ContactForm';
 import Filter from './filter/Filter';
 import ContactsList from './contactsList/ContactsList';
-import s from './App.module.css'
-
-const initialState = {
-  filter: '',
-  name: '',
-  number: '',
-};
+import s from './App.module.css';
 
 class App extends Component {
   state = {
@@ -30,22 +23,14 @@ class App extends Component {
     this.setState({ [name]: value });
   };
 
-  handleSubmitForm = e => {
-    e.preventDefault();
-    const { contacts, name, number } = this.state;
-    if (this.checkRepeatContact()) {
+  addContact = data => {
+    const { name } = this.state;
+    if (this.checkRepeatContact(data)) {
       return Report.failure(`${name} is already in contacts.`);
     }
 
-    this.setState({
-      contacts: [...contacts, { name: name, number: number, id: nanoid() }],
-      name: '',
-      number: '',
-    });
-    this.reset();
+    this.setState(prev => ({ contacts: [...prev.contacts, data] }));
   };
-
-  reset = () => this.setState(initialState);
 
   getFilterSearchContact = () => {
     const { contacts, filter } = this.state;
@@ -55,9 +40,11 @@ class App extends Component {
     );
   };
 
-  checkRepeatContact = () => {
-    const { contacts, name } = this.state;
-    return contacts.find(contact => contact.name === name);
+  checkRepeatContact = data => {
+    const { contacts } = this.state;
+    return contacts.find(
+      contact => contact.name.toLowerCase() === data.name.toLowerCase()
+    );
   };
 
   deleteContact = id =>
@@ -66,18 +53,13 @@ class App extends Component {
     }));
 
   render() {
-    const { name, number, filter } = this.state;
+    const { filter } = this.state;
     const filterSearchContact = this.getFilterSearchContact();
 
     return (
       <div className={s.container}>
         <h1 className={s.mainTitle}>Phonebook</h1>
-        <ContactForm
-          name={name}
-          number={number}
-          handleSubmitForm={this.handleSubmitForm}
-          handleChange={this.handleChange}
-        />
+        <ContactForm addContact={this.addContact} />
         <h2 className={s.secondaryTitle}>Contacts</h2>
         <Filter filter={filter} handleChange={this.handleChange} />
         <ContactsList
