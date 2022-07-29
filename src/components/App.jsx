@@ -14,8 +14,6 @@ class App extends Component {
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
-    name: '',
-    number: '',
   };
 
   handleChange = e => {
@@ -24,9 +22,8 @@ class App extends Component {
   };
 
   addContact = data => {
-    const { name } = this.state;
     if (this.checkRepeatContact(data)) {
-      return Report.failure(`${name} is already in contacts.`);
+      return Report.failure(`${data.name} is already in contacts.`);
     }
 
     this.setState(prev => ({ contacts: [...prev.contacts, data] }));
